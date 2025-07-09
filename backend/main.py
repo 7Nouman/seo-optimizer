@@ -87,9 +87,6 @@ async def analyze(request: AnalyzeRequest, background_tasks: BackgroundTasks):
         nlp=nlp_result
     )
 
-@app.get("/favicon.ico")
-def favicon():
-    return FileResponse(os.path.join(os.path.dirname(__file__), "favicon.ico"))
 
 @app.get("/")
 def root():
