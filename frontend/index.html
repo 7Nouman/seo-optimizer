@@ -208,6 +208,8 @@
         resultsContainer.innerHTML = '';
         // Fetch from backend
         try {
+          console.log('Backend URL:', BACKEND_URL);
+          console.log('Full fetch URL:', `${BACKEND_URL}/analyze`);
           const res = await fetch(`${BACKEND_URL}/analyze`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
