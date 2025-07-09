@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@heroicons/vue@2.0.16/outline/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
       // === CONFIGURE YOUR BACKEND URL HERE ===
       const BACKEND_URL = 'https://seo-optimizer-n0so.onrender.com'; // Change to your Render backend URL
@@ -138,36 +139,27 @@
       </div>
     </section>
     <!-- Results Section (hidden by default, show after analysis) -->
-    <section id="results" class="py-12 px-4 max-w-4xl mx-auto hidden">
-      <div class="bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-2xl p-10 flex flex-col md:flex-row gap-10 items-center border border-blue-100 dark:border-gray-800 backdrop-blur-md">
-        <!-- Progress Circle (SVG) -->
-        <div class="flex-1 flex flex-col items-center">
-          <svg class="w-32 h-32" viewBox="0 0 120 120">
-            <circle cx="60" cy="60" r="54" fill="none" stroke="#e5e7eb" stroke-width="12" />
-            <circle cx="60" cy="60" r="54" fill="none" stroke="#06b6d4" stroke-width="12" stroke-dasharray="339.292" stroke-dashoffset="50" stroke-linecap="round" />
-            <text x="50%" y="54%" text-anchor="middle" fill="#06b6d4" font-size="2.5rem" font-weight="bold" dy=".3em">89</text>
-          </svg>
-          <div class="mt-2 text-lg font-bold text-cyan-500">SEO Score</div>
+    <section id="results" class="py-12 px-4 max-w-5xl mx-auto hidden">
+      <div class="bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-2xl p-10 flex flex-col gap-10 border border-blue-100 dark:border-gray-800 backdrop-blur-md">
+        <!-- Dashboard Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div class="flex flex-col items-center p-6 rounded-2xl bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 shadow">
+            <canvas id="seoScoreChart" width="100" height="100"></canvas>
+            <div class="mt-2 text-lg font-bold text-blue-500">SEO Score</div>
+          </div>
+          <div class="flex flex-col items-center p-6 rounded-2xl bg-gradient-to-br from-green-50 to-white dark:from-gray-800 dark:to-gray-900 shadow">
+            <canvas id="perfScoreChart" width="100" height="100"></canvas>
+            <div class="mt-2 text-lg font-bold text-green-500">Performance</div>
+          </div>
+          <div class="flex flex-col items-center p-6 rounded-2xl bg-gradient-to-br from-yellow-50 to-white dark:from-gray-800 dark:to-gray-900 shadow">
+            <canvas id="keywordChart" width="100" height="100"></canvas>
+            <div class="mt-2 text-lg font-bold text-yellow-500">Top Keywords</div>
+          </div>
         </div>
-        <!-- Checks List -->
-        <div class="flex-1 grid grid-cols-1 gap-4">
-          <div class="flex items-center gap-2">
-            <span class="inline-block w-3 h-3 rounded-full bg-green-400"></span>
-            <span class="font-semibold">Passed:</span>
-            <span>Meta Tags, Sitemap, Mobile-Friendly</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="inline-block w-3 h-3 rounded-full bg-yellow-400"></span>
-            <span class="font-semibold">Warnings:</span>
-            <span>Image Alt Text, Page Speed</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="inline-block w-3 h-3 rounded-full bg-red-400"></span>
-            <span class="font-semibold">Failed:</span>
-            <span>Robots.txt, Keyword Density</span>
-          </div>
-          <button class="mt-6 px-6 py-3 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold shadow-lg hover:scale-105 hover:bg-gradient-to-l transition-all">Download PDF Report</button>
-        </div>
+        <!-- Actionable Suggestions -->
+        <div id="improvement-list" class="mb-8"></div>
+        <!-- Details Section -->
+        <div id="dashboard-details" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
       </div>
     </section>
     <!-- Footer -->
@@ -205,7 +197,13 @@
         }
         resultsSection.classList.remove('hidden');
         // Clear previous results
-        resultsContainer.innerHTML = '';
+        document.getElementById('improvement-list').innerHTML = '';
+        document.getElementById('dashboard-details').innerHTML = '';
+        // Clear charts
+        ['seoScoreChart','perfScoreChart','keywordChart'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el && el.chartInstance) { el.chartInstance.destroy(); }
+        });
         // Fetch from backend
         try {
           console.log('Backend URL:', BACKEND_URL);
@@ -219,38 +217,87 @@
           const data = await res.json();
           // Remove spinner
           if (loadingSpinner) loadingSpinner.remove();
-          // Render results
-          let html = '';
-          html += `<div class='mb-4'><span class='font-bold text-lg text-blue-500'>URL:</span> <span>${data.url}</span></div>`;
+          // --- Dashboard Summary Cards ---
+          // SEO & Performance Scores
+          let seoScore = null, perfScore = null;
+          if (data.performance && data.performance.lighthouseResult && data.performance.lighthouseResult.categories) {
+            seoScore = data.performance.lighthouseResult.categories.seo?.score || null;
+            perfScore = data.performance.lighthouseResult.categories.performance?.score || null;
+          }
+          // Render SEO Score Chart
+          if (seoScore !== null) {
+            const ctx = document.getElementById('seoScoreChart').getContext('2d');
+            if (document.getElementById('seoScoreChart').chartInstance) document.getElementById('seoScoreChart').chartInstance.destroy();
+            document.getElementById('seoScoreChart').chartInstance = new Chart(ctx, {
+              type: 'doughnut',
+              data: { datasets: [{ data: [seoScore, 1-seoScore], backgroundColor: ['#06b6d4','#e5e7eb'], borderWidth: 0 }] },
+              options: { cutout: '80%', plugins: { legend: {display: false}, tooltip: {enabled: false}, title: {display: true, text: `${Math.round(seoScore*100)}`}}, }
+            });
+          }
+          // Render Performance Score Chart
+          if (perfScore !== null) {
+            const ctx = document.getElementById('perfScoreChart').getContext('2d');
+            if (document.getElementById('perfScoreChart').chartInstance) document.getElementById('perfScoreChart').chartInstance.destroy();
+            document.getElementById('perfScoreChart').chartInstance = new Chart(ctx, {
+              type: 'doughnut',
+              data: { datasets: [{ data: [perfScore, 1-perfScore], backgroundColor: ['#22c55e','#e5e7eb'], borderWidth: 0 }] },
+              options: { cutout: '80%', plugins: { legend: {display: false}, tooltip: {enabled: false}, title: {display: true, text: `${Math.round(perfScore*100)}`}}, }
+            });
+          }
+          // Render Keyword Bar Chart
+          if (data.nlp && data.nlp.top_keywords && data.nlp.top_keywords.length) {
+            const ctx = document.getElementById('keywordChart').getContext('2d');
+            if (document.getElementById('keywordChart').chartInstance) document.getElementById('keywordChart').chartInstance.destroy();
+            document.getElementById('keywordChart').chartInstance = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels: data.nlp.top_keywords.map(([w]) => w),
+                datasets: [{ label: 'Count', data: data.nlp.top_keywords.map(([,c])=>c), backgroundColor: '#facc15' }]
+              },
+              options: { plugins: { legend: {display: false} }, scales: { y: { beginAtZero: true } } }
+            });
+          }
+          // --- Actionable Suggestions ---
+          let suggestions = [];
+          if (data.images && data.images.missing_alt && data.images.missing_alt.length > 0) suggestions.push(`Add alt text to ${data.images.missing_alt.length} image(s).`);
+          if (data.meta && !data.meta.description) suggestions.push('Add a meta description.');
+          if (seoScore !== null && seoScore < 0.9) suggestions.push('Improve SEO best practices.');
+          if (perfScore !== null && perfScore < 0.9) suggestions.push('Improve page speed and performance.');
+          if (suggestions.length === 0) suggestions.push('Great job! No major issues found.');
+          document.getElementById('improvement-list').innerHTML = `<div class='mb-2 text-xl font-bold text-cyan-600'>What to Improve</div><ul class='list-disc ml-6'>${suggestions.map(s=>`<li>${s}</li>`).join('')}</ul>`;
+          // --- Details Section ---
+          let detailsHTML = '';
           // Meta tags
-          html += `<div class='mb-4'><span class='font-bold text-blue-500'>Meta Tags:</span><ul class='list-disc ml-6'>`;
+          detailsHTML += `<div class='bg-white dark:bg-gray-900 rounded-xl shadow p-4'><div class='font-bold text-blue-500 mb-2'>Meta Tags</div><ul class='list-disc ml-6'>`;
           for (const [k, v] of Object.entries(data.meta || {})) {
-            html += `<li><span class='font-semibold'>${k}:</span> <span class='text-gray-700 dark:text-gray-200'>${v}</span></li>`;
+            detailsHTML += `<li><span class='font-semibold'>${k}:</span> <span class='text-gray-700 dark:text-gray-200'>${v}</span></li>`;
           }
-          html += '</ul></div>';
+          detailsHTML += '</ul></div>';
           // Headings
-          html += `<div class='mb-4'><span class='font-bold text-blue-500'>Headings:</span><ul class='list-disc ml-6'>`;
+          detailsHTML += `<div class='bg-white dark:bg-gray-900 rounded-xl shadow p-4'><div class='font-bold text-blue-500 mb-2'>Headings</div><ul class='list-disc ml-6'>`;
           for (const [k, arr] of Object.entries(data.headings || {})) {
-            if (arr.length) html += `<li><span class='font-semibold'>${k}:</span> <span class='text-gray-700 dark:text-gray-200'>${arr.join(', ')}</span></li>`;
+            if (arr.length) detailsHTML += `<li><span class='font-semibold'>${k}:</span> <span class='text-gray-700 dark:text-gray-200'>${arr.join(', ')}</span></li>`;
           }
-          html += '</ul></div>';
+          detailsHTML += '</ul></div>';
           // Images
-          html += `<div class='mb-4'><span class='font-bold text-blue-500'>Images:</span> <span class='text-gray-700 dark:text-gray-200'>${data.images?.count || 0} images, ${data.images?.missing_alt?.length || 0} missing alt</span></div>`;
+          detailsHTML += `<div class='bg-white dark:bg-gray-900 rounded-xl shadow p-4'><div class='font-bold text-blue-500 mb-2'>Images</div><div class='text-gray-700 dark:text-gray-200'>${data.images?.count || 0} images, ${data.images?.missing_alt?.length || 0} missing alt</div>`;
           if (data.images?.missing_alt?.length) {
-            html += `<div class='mb-4'><span class='font-semibold text-yellow-500'>Images missing alt:</span> <ul class='list-disc ml-6'>${data.images.missing_alt.map(src => `<li>${src}</li>`).join('')}</ul></div>`;
+            detailsHTML += `<div class='mt-2 text-yellow-500 font-semibold'>Images missing alt:</div><ul class='list-disc ml-6'>${data.images.missing_alt.map(src => `<li>${src}</li>`).join('')}</ul>`;
           }
-          // Performance
+          detailsHTML += '</div>';
+          // Performance (raw JSON for now)
           if (data.performance) {
-            html += `<div class='mb-4'><span class='font-bold text-blue-500'>Performance (Google PSI):</span><pre class='bg-gray-100 dark:bg-gray-800 rounded p-2 overflow-x-auto text-xs'>${JSON.stringify(data.performance.lighthouseResult?.categories, null, 2)}</pre></div>`;
+            detailsHTML += `<div class='bg-white dark:bg-gray-900 rounded-xl shadow p-4'><div class='font-bold text-blue-500 mb-2'>Performance (Google PSI)</div><pre class='bg-gray-100 dark:bg-gray-800 rounded p-2 overflow-x-auto text-xs'>${JSON.stringify(data.performance.lighthouseResult?.categories, null, 2)}</pre></div>`;
           }
           // NLP
           if (data.nlp) {
-            html += `<div class='mb-4'><span class='font-bold text-blue-500'>Top Keywords:</span> <ul class='list-disc ml-6'>${(data.nlp.top_keywords || []).map(([word, count]) => `<li>${word}: ${count}</li>`).join('')}</ul></div>`;
+            detailsHTML += `<div class='bg-white dark:bg-gray-900 rounded-xl shadow p-4'><div class='font-bold text-blue-500 mb-2'>Top Keywords</div><ul class='list-disc ml-6'>${(data.nlp.top_keywords || []).map(([word, count]) => `<li>${word}: ${count}</li>`).join('')}</ul></div>`;
           }
-          resultsContainer.innerHTML = html;
+          document.getElementById('dashboard-details').innerHTML = detailsHTML;
         } catch (err) {
           if (loadingSpinner) loadingSpinner.remove();
-          resultsContainer.innerHTML = `<div class='text-red-500 font-bold'>Error: ${err.message || err}</div>`;
+          document.getElementById('improvement-list').innerHTML = `<div class='text-red-500 font-bold'>Error: ${err.message || err}</div>`;
+          document.getElementById('dashboard-details').innerHTML = '';
         }
         window.scrollTo({ top: resultsSection.offsetTop - 40, behavior: 'smooth' });
       });
