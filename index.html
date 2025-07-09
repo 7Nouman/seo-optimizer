@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SEO Optimizer</title>
+    <meta name="description" content="Boost your website's SEO with AI-powered analysis, actionable insights, and beautiful reports. Modern, responsive, and professional SEO Optimizer web app.">
+    <meta name="theme-color" content="#0ea5e9">
+    <link rel="icon" href="https://cdn.jsdelivr.net/gh/tailwindlabs/heroicons@v2.0.16/optimized/outline/rocket-launch.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@heroicons/vue@2.0.16/outline/index.js"></script>
+    <script>
+      // === CONFIGURE YOUR BACKEND URL HERE ===
+      const BACKEND_URL = 'https://seo-backend.onrender.com'; // Change to your Render backend URL
+      // Tailwind dark mode toggle
+      function toggleTheme() {
+        document.documentElement.classList.toggle('dark');
+      }
+    </script>
+    <style>
+      body { font-family: 'Inter', sans-serif; }
+      .transition-all { transition: all 0.3s cubic-bezier(.4,0,.2,1); }
+      /* Soft animated background gradient */
+      .animated-bg {
+        background: linear-gradient(120deg, #e0e7ff 0%, #f0fdfa 50%, #f5d0fe 100%);
+        background-size: 200% 200%;
+        animation: bgMove 12s ease-in-out infinite;
+      }
+      @keyframes bgMove {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+      /* Parallax effect for hero background */
+      .parallax-hero {
+        perspective: 1000px;
+        overflow: visible;
+      }
+      .parallax-float {
+        will-change: transform;
+        transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+      }
+      /* Micro-interaction for Analyze button */
+      .analyze-btn:active {
+        transform: scale(0.97) rotate(-1deg);
+        box-shadow: 0 2px 16px 0 #0ea5e9cc;
+      }
+      /* Subtle shadow for theme toggle */
+      .theme-toggle-shadow {
+        box-shadow: 0 4px 24px 0 #0ea5e955, 0 1.5px 4px 0 #0001;
+      }
+      @keyframes spin-slow {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .animate-spin-slow {
+        animation: spin-slow 3.5s linear infinite;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col animated-bg bg-gradient-to-br from-gray-50 to-blue-100 dark:from-gray-900 dark:to-gray-800 transition-all">
+    <!-- Theme Toggle -->
+    <div class="fixed top-4 right-4 z-50 fade-in theme-toggle-shadow" style="opacity:0;">
+      <button onclick="toggleTheme()" class="p-2 rounded-full bg-white/80 dark:bg-gray-800/80 shadow-lg hover:scale-110 transition-all backdrop-blur-md border border-blue-200 dark:border-gray-700 focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700 dark:text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.95l-.71.71M21 12h-1M4 12H3m16.66 5.66l-.71-.71M4.05 4.05l-.71-.71" />
+        </svg>
+      </button>
+    </div>
+    <!-- Hero Section -->
+    <section id="hero" class="flex flex-col items-center justify-center py-20 px-4 text-center opacity-0 translate-y-8 transition-all duration-700 parallax-hero">
+      <div class="relative w-full max-w-3xl mx-auto mb-8">
+        <div class="absolute inset-0 rounded-3xl bg-gradient-to-r from-blue-400/30 via-teal-300/20 to-purple-400/30 blur-2xl animate-pulse z-0"></div>
+        <h1 class="relative z-10 text-4xl md:text-6xl font-extrabold mb-4 bg-gradient-to-r from-blue-500 via-teal-400 to-purple-500 bg-clip-text text-transparent tracking-tight drop-shadow-[0_4px_24px_rgba(14,165,233,0.25)]">
+          Boost Your Website’s SEO Now
+        </h1>
+      </div>
+      <p class="text-lg md:text-2xl text-gray-600 dark:text-gray-300 mb-10 max-w-2xl font-medium">Unlock your site’s full potential with <span class="bg-gradient-to-r from-blue-400 to-teal-400 text-transparent bg-clip-text font-bold">AI-powered SEO analysis</span>, actionable insights, and beautiful reports.</p>
+      <!-- URL Input Form -->
+      <form id="url-form" class="w-full max-w-xl mx-auto flex flex-col sm:flex-row gap-4 items-center justify-center opacity-0 translate-y-8 transition-all duration-700 delay-200 bg-white/70 dark:bg-gray-800/70 rounded-xl shadow-xl p-4 backdrop-blur-md border border-blue-100 dark:border-gray-800">
+        <input type="url" required placeholder="Enter your website URL" class="flex-1 px-5 py-3 rounded-lg border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-blue-400 outline-none text-lg bg-white/80 dark:bg-gray-900/80 transition-all shadow-sm" />
+        <button type="submit" class="analyze-btn px-8 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-teal-400 text-white font-bold text-lg shadow-lg hover:scale-105 hover:bg-gradient-to-l transition-all focus:outline-none">Analyze</button>
+      </form>
+    </section>
+    <!-- Features Section -->
+    <section id="features" class="py-16 px-4 bg-white/80 dark:bg-gray-900/80 transition-all opacity-0 translate-y-8 transition-all duration-700 delay-300">
+      <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div class="feature-card group bg-gradient-to-br from-blue-50/80 to-white/60 dark:from-gray-800/80 dark:to-gray-900/60 rounded-3xl shadow-2xl p-8 flex flex-col items-center text-center opacity-0 scale-95 transition-all duration-700 border border-transparent hover:border-blue-400 hover:shadow-blue-200 dark:hover:shadow-blue-900 hover:scale-105 backdrop-blur-md" style="transition-delay: 0ms;">
+          <div class="w-16 h-16 mb-4 rounded-full bg-gradient-to-tr from-blue-400 to-teal-300 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+            <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" /></svg>
+          </div>
+          <h3 class="font-bold text-xl mb-2">On-Page SEO Checks</h3>
+          <p class="text-gray-600 dark:text-gray-400">Meta Tags, Headings, Alt Attributes</p>
+        </div>
+        <div class="feature-card group bg-gradient-to-br from-green-50/80 to-white/60 dark:from-gray-800/80 dark:to-gray-900/60 rounded-3xl shadow-2xl p-8 flex flex-col items-center text-center opacity-0 scale-95 transition-all duration-700 border border-transparent hover:border-green-400 hover:shadow-green-200 dark:hover:shadow-green-900 hover:scale-105 backdrop-blur-md" style="transition-delay: 100ms;">
+          <div class="w-16 h-16 mb-4 rounded-full bg-gradient-to-tr from-green-400 to-blue-300 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+            <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18" /></svg>
+          </div>
+          <h3 class="font-bold text-xl mb-2">Performance & Page Speed</h3>
+          <p class="text-gray-600 dark:text-gray-400">Detailed speed & performance report</p>
+        </div>
+        <div class="feature-card group bg-gradient-to-br from-yellow-50/80 to-white/60 dark:from-gray-800/80 dark:to-gray-900/60 rounded-3xl shadow-2xl p-8 flex flex-col items-center text-center opacity-0 scale-95 transition-all duration-700 border border-transparent hover:border-yellow-400 hover:shadow-yellow-200 dark:hover:shadow-yellow-900 hover:scale-105 backdrop-blur-md" style="transition-delay: 200ms;">
+          <div class="w-16 h-16 mb-4 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-300 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+            <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 17v-2a4 4 0 0 1 8 0v2" /><circle cx="12" cy="7" r="4" /></svg>
+          </div>
+          <h3 class="font-bold text-xl mb-2">Sitemap & Robots.txt</h3>
+          <p class="text-gray-600 dark:text-gray-400">Validator for sitemap and robots.txt</p>
+        </div>
+        <div class="feature-card group bg-gradient-to-br from-pink-50/80 to-white/60 dark:from-gray-800/80 dark:to-gray-900/60 rounded-3xl shadow-2xl p-8 flex flex-col items-center text-center opacity-0 scale-95 transition-all duration-700 border border-transparent hover:border-pink-400 hover:shadow-pink-200 dark:hover:shadow-pink-900 hover:scale-105 backdrop-blur-md" style="transition-delay: 300ms;">
+          <div class="w-16 h-16 mb-4 rounded-full bg-gradient-to-tr from-pink-400 to-yellow-300 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+            <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z" /><path d="M2 12C2 6.48 6.48 2 12 2s10 4.48 10 10-4.48 10-10 10S2 17.52 2 12z" /></svg>
+          </div>
+          <h3 class="font-bold text-xl mb-2">Mobile-Friendly Test</h3>
+          <p class="text-gray-600 dark:text-gray-400">Check mobile usability & responsiveness</p>
+        </div>
+        <div class="feature-card group bg-gradient-to-br from-indigo-50/80 to-white/60 dark:from-gray-800/80 dark:to-gray-900/60 rounded-3xl shadow-2xl p-8 flex flex-col items-center text-center opacity-0 scale-95 transition-all duration-700 border border-transparent hover:border-indigo-400 hover:shadow-indigo-200 dark:hover:shadow-indigo-900 hover:scale-105 backdrop-blur-md" style="transition-delay: 400ms;">
+          <div class="w-16 h-16 mb-4 rounded-full bg-gradient-to-tr from-indigo-400 to-blue-300 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+            <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /></svg>
+          </div>
+          <h3 class="font-bold text-xl mb-2">Image Optimization</h3>
+          <p class="text-gray-600 dark:text-gray-400">Summary of image compression & alt text</p>
+        </div>
+        <div class="feature-card group bg-gradient-to-br from-teal-50/80 to-white/60 dark:from-gray-800/80 dark:to-gray-900/60 rounded-3xl shadow-2xl p-8 flex flex-col items-center text-center opacity-0 scale-95 transition-all duration-700 border border-transparent hover:border-teal-400 hover:shadow-teal-200 dark:hover:shadow-teal-900 hover:scale-105 backdrop-blur-md" style="transition-delay: 500ms;">
+          <div class="w-16 h-16 mb-4 rounded-full bg-gradient-to-tr from-teal-400 to-blue-300 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+            <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 17l4 4 4-4m-4-5v9" /></svg>
+          </div>
+          <h3 class="font-bold text-xl mb-2">Keyword Density Checker</h3>
+          <p class="text-gray-600 dark:text-gray-400">AI/NLP powered keyword analysis</p>
+        </div>
+        <div class="feature-card group bg-gradient-to-br from-cyan-50/80 to-white/60 dark:from-gray-800/80 dark:to-gray-900/60 rounded-3xl shadow-2xl p-8 flex flex-col items-center text-center col-span-1 md:col-span-3 opacity-0 scale-95 transition-all duration-700 border border-transparent hover:border-cyan-400 hover:shadow-cyan-200 dark:hover:shadow-cyan-900 hover:scale-105 backdrop-blur-md" style="transition-delay: 600ms;">
+          <div class="w-16 h-16 mb-4 rounded-full bg-gradient-to-tr from-cyan-400 to-blue-300 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+            <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
+          </div>
+          <h3 class="font-bold text-xl mb-2">SEO Score & Visual Chart</h3>
+          <p class="text-gray-600 dark:text-gray-400">Get a clear SEO score with a visual chart</p>
+        </div>
+      </div>
+    </section>
+    <!-- Results Section (hidden by default, show after analysis) -->
+    <section id="results" class="py-12 px-4 max-w-4xl mx-auto hidden">
+      <div class="bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-2xl p-10 flex flex-col md:flex-row gap-10 items-center border border-blue-100 dark:border-gray-800 backdrop-blur-md">
+        <!-- Progress Circle (SVG) -->
+        <div class="flex-1 flex flex-col items-center">
+          <svg class="w-32 h-32" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="54" fill="none" stroke="#e5e7eb" stroke-width="12" />
+            <circle cx="60" cy="60" r="54" fill="none" stroke="#06b6d4" stroke-width="12" stroke-dasharray="339.292" stroke-dashoffset="50" stroke-linecap="round" />
+            <text x="50%" y="54%" text-anchor="middle" fill="#06b6d4" font-size="2.5rem" font-weight="bold" dy=".3em">89</text>
+          </svg>
+          <div class="mt-2 text-lg font-bold text-cyan-500">SEO Score</div>
+        </div>
+        <!-- Checks List -->
+        <div class="flex-1 grid grid-cols-1 gap-4">
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-3 h-3 rounded-full bg-green-400"></span>
+            <span class="font-semibold">Passed:</span>
+            <span>Meta Tags, Sitemap, Mobile-Friendly</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-3 h-3 rounded-full bg-yellow-400"></span>
+            <span class="font-semibold">Warnings:</span>
+            <span>Image Alt Text, Page Speed</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-3 h-3 rounded-full bg-red-400"></span>
+            <span class="font-semibold">Failed:</span>
+            <span>Robots.txt, Keyword Density</span>
+          </div>
+          <button class="mt-6 px-6 py-3 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold shadow-lg hover:scale-105 hover:bg-gradient-to-l transition-all">Download PDF Report</button>
+        </div>
+      </div>
+    </section>
+    <!-- Footer -->
+    <footer id="footer" class="mt-auto py-10 px-4 bg-gradient-to-r from-blue-900 via-purple-900 to-gray-900 text-white text-center flex flex-col md:flex-row items-center justify-between gap-4 opacity-0 translate-y-8 transition-all duration-700 delay-700 shadow-2xl border-t border-blue-800/30">
+      <div class="flex items-center gap-2 justify-center">
+        <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" /></svg>
+        <span class="font-bold text-lg tracking-wide">SEO Optimizer</span>
+      </div>
+      <div class="flex items-center gap-4 justify-center">
+        <a href="https://github.com/your-github" target="_blank" class="hover:underline flex items-center gap-1"><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.58 2 12.26c0 4.48 2.87 8.28 6.84 9.63.5.09.68-.22.68-.48 0-.24-.01-.87-.01-1.7-2.78.62-3.37-1.36-3.37-1.36-.45-1.18-1.1-1.5-1.1-1.5-.9-.63.07-.62.07-.62 1 .07 1.53 1.05 1.53 1.05.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.28 2.75 1.05A9.38 9.38 0 0 1 12 7.07c.85.004 1.71.12 2.51.35 1.91-1.33 2.75-1.05 2.75-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.81-4.57 5.07.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.58.69.48C19.13 20.54 22 16.74 22 12.26 22 6.58 17.52 2 12 2z"/></svg> GitHub</a>
+        <span>|</span>
+        <a href="mailto:contact@seo-optimizer.com" class="hover:underline">contact@seo-optimizer.com</a>
+      </div>
+      <div class="text-sm text-gray-300">&copy; 2024 SEO Optimizer. All rights reserved.</div>
+    </footer>
+    <script>
+      // Example: Show results section after form submit (for demo only)
+      // Connect frontend to FastAPI backend
+      const form = document.querySelector('form');
+      const resultsSection = document.getElementById('results');
+      const resultsContainer = resultsSection.querySelector('.flex-1.grid') || resultsSection;
+      let loadingSpinner;
+
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const urlInput = form.querySelector('input[type="url"]');
+        const url = urlInput.value.trim();
+        if (!url) return;
+        // Show loading spinner
+        if (!loadingSpinner) {
+          loadingSpinner = document.createElement('div');
+          loadingSpinner.className = 'flex justify-center items-center w-full py-8';
+          loadingSpinner.innerHTML = '<svg class="animate-spin h-10 w-10 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>';
+          resultsSection.querySelector('div').appendChild(loadingSpinner);
+        }
+        resultsSection.classList.remove('hidden');
+        // Clear previous results
+        resultsContainer.innerHTML = '';
+        // Fetch from backend
+        try {
+          const res = await fetch(`${BACKEND_URL}/analyze`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url })
+          });
+          if (!res.ok) throw new Error('Failed to analyze');
+          const data = await res.json();
+          // Remove spinner
+          if (loadingSpinner) loadingSpinner.remove();
+          // Render results
+          let html = '';
+          html += `<div class='mb-4'><span class='font-bold text-lg text-blue-500'>URL:</span> <span>${data.url}</span></div>`;
+          // Meta tags
+          html += `<div class='mb-4'><span class='font-bold text-blue-500'>Meta Tags:</span><ul class='list-disc ml-6'>`;
+          for (const [k, v] of Object.entries(data.meta || {})) {
+            html += `<li><span class='font-semibold'>${k}:</span> <span class='text-gray-700 dark:text-gray-200'>${v}</span></li>`;
+          }
+          html += '</ul></div>';
+          // Headings
+          html += `<div class='mb-4'><span class='font-bold text-blue-500'>Headings:</span><ul class='list-disc ml-6'>`;
+          for (const [k, arr] of Object.entries(data.headings || {})) {
+            if (arr.length) html += `<li><span class='font-semibold'>${k}:</span> <span class='text-gray-700 dark:text-gray-200'>${arr.join(', ')}</span></li>`;
+          }
+          html += '</ul></div>';
+          // Images
+          html += `<div class='mb-4'><span class='font-bold text-blue-500'>Images:</span> <span class='text-gray-700 dark:text-gray-200'>${data.images?.count || 0} images, ${data.images?.missing_alt?.length || 0} missing alt</span></div>`;
+          if (data.images?.missing_alt?.length) {
+            html += `<div class='mb-4'><span class='font-semibold text-yellow-500'>Images missing alt:</span> <ul class='list-disc ml-6'>${data.images.missing_alt.map(src => `<li>${src}</li>`).join('')}</ul></div>`;
+          }
+          // Performance
+          if (data.performance) {
+            html += `<div class='mb-4'><span class='font-bold text-blue-500'>Performance (Google PSI):</span><pre class='bg-gray-100 dark:bg-gray-800 rounded p-2 overflow-x-auto text-xs'>${JSON.stringify(data.performance.lighthouseResult?.categories, null, 2)}</pre></div>`;
+          }
+          // NLP
+          if (data.nlp) {
+            html += `<div class='mb-4'><span class='font-bold text-blue-500'>Top Keywords:</span> <ul class='list-disc ml-6'>${(data.nlp.top_keywords || []).map(([word, count]) => `<li>${word}: ${count}</li>`).join('')}</ul></div>`;
+          }
+          resultsContainer.innerHTML = html;
+        } catch (err) {
+          if (loadingSpinner) loadingSpinner.remove();
+          resultsContainer.innerHTML = `<div class='text-red-500 font-bold'>Error: ${err.message || err}</div>`;
+        }
+        window.scrollTo({ top: resultsSection.offsetTop - 40, behavior: 'smooth' });
+      });
+      // Entrance animation logic
+      window.addEventListener('DOMContentLoaded', () => {
+        // Theme toggle
+        document.querySelector('.fixed.top-4.right-4').style.opacity = 1;
+        document.querySelector('.fixed.top-4.right-4').classList.add('transition-all');
+        // Hero
+        setTimeout(() => {
+          document.getElementById('hero').classList.remove('opacity-0', 'translate-y-8');
+        }, 100);
+        // Form
+        setTimeout(() => {
+          document.getElementById('url-form').classList.remove('opacity-0', 'translate-y-8');
+        }, 200);
+        // Features section
+        setTimeout(() => {
+          document.getElementById('features').classList.remove('opacity-0', 'translate-y-8');
+        }, 700);
+        // Stagger feature cards
+        document.querySelectorAll('.feature-card').forEach((el, i) => {
+          setTimeout(() => {
+            el.classList.remove('opacity-0', 'scale-95');
+          }, 900 + i * 100);
+        });
+        // Footer
+        setTimeout(() => {
+          document.getElementById('footer').classList.remove('opacity-0', 'translate-y-8');
+        }, 1800);
+      });
+      // Scroll-triggered animation logic
+      function animateOnScroll(selector, visibleClass = 'opacity-100 translate-y-0', hiddenClass = 'opacity-0 translate-y-8') {
+        const elements = document.querySelectorAll(selector);
+        const observer = new window.IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add(...visibleClass.split(' '));
+              entry.target.classList.remove(...hiddenClass.split(' '));
+            }
+          });
+        }, { threshold: 0.15 });
+        elements.forEach(el => {
+          observer.observe(el);
+        });
+      }
+      window.addEventListener('DOMContentLoaded', () => {
+        animateOnScroll('#hero', 'opacity-100 translate-y-0', 'opacity-0 translate-y-8');
+        animateOnScroll('#features', 'opacity-100 translate-y-0', 'opacity-0 translate-y-8');
+        animateOnScroll('.feature-card', 'opacity-100 scale-100', 'opacity-0 scale-95');
+        animateOnScroll('#footer', 'opacity-100 translate-y-0', 'opacity-0 translate-y-8');
+      });
+    </script>
+  </body>
+</html> 
